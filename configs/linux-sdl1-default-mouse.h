@@ -80,7 +80,7 @@ extern "C" {
   // - Values 0,1,2,3. Rotation is clockwise
   // NOTE: The GSLC_ROTATE feature is not yet supported in SDL mode
   //       however, the following settings are provided for future use.
-  #define GSLC_ROTATE     1
+  #define GSLC_ROTATE     3
 
   // -----------------------------------------------------------------------------
   // SECTION 4: Touch Handling
@@ -161,7 +161,7 @@ extern "C" {
 
   #define GSLC_USE_FLOAT        1   // 1=Use floating pt library, 0=Fixed-point lookup tables
 
-  #define GSLC_DEV_FB           "/dev/fb0" // LINUX framebuffer
+  #define GSLC_DEV_FB           "/dev/fb1" // LINUX framebuffer
   #define GSLC_DEV_TOUCH        ""
   #define GSLC_DEV_VID_DRV      "x11"
 
@@ -169,7 +169,7 @@ extern "C" {
   #define DRV_SDL_FIX_START     0
 
   // Show SDL mouse (1 to show, 0 to hide)
-  #define DRV_SDL_MOUSE_SHOW    1
+  #define DRV_SDL_MOUSE_SHOW    0
 
   #define GSLC_USE_PROGMEM      0
 
