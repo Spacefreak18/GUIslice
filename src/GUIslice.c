@@ -776,6 +776,7 @@ void gslc_Update(gslc_tsGui* pGui)
     yield();
   #endif
 
+  gslc_InvalidateRgnScreen(pGui);
 }
 
 gslc_tsEvent  gslc_EventCreate(gslc_tsGui* pGui,gslc_teEventType eType,uint8_t nSubType,void* pvScope,void* pvData)

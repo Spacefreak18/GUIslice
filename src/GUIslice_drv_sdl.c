@@ -44,6 +44,7 @@
 
 #include <stdio.h>
 
+
 // ------------------------------------------------------------------------
 // Load display & touch drivers
 // ------------------------------------------------------------------------
@@ -62,6 +63,7 @@
 // Define driver names
 #if defined(DRV_DISP_SDL1)
   const char* m_acDrvDisp = "SDL1";
+  #include "SDL/SDL_rotozoom.h"
 #elif defined(DRV_DISP_SDL2)
   const char* m_acDrvDisp = "SDL2";
 #endif
@@ -71,7 +73,6 @@
 #else
   const char* m_acDrvTouch = "SDL";
 #endif
-
 
 // =======================================================================
 // Public APIs to GUIslice core library
@@ -236,7 +237,7 @@ bool gslc_DrvInit(gslc_tsGui* pGui)
   // scaled when in touch mode, we will disable the mouse pointer.
   // Note that the SDL coords seem to be OK when in actual mouse mode.
   #if (!DRV_SDL_MOUSE_SHOW)
-  SDL_ShowCursor(SDL_DISABLE);
+    SDL_ShowCursor(SDL_DISABLE);
   #endif
 
   return true;
@@ -1020,9 +1021,15 @@ bool gslc_DrvGetTouch(gslc_tsGui* pGui,int16_t* pnX,int16_t* pnY,uint16_t* pnPre
 /// Change display rotation and any associated touch orientation
 bool gslc_DrvRotate(gslc_tsGui* pGui, uint8_t nRotation)
 {
-  // TODO: Implement support for display rotation
-  GSLC_DEBUG2_PRINT("ERROR: DrvRotate(%s) not supported in current DRV_DISP_SDL* mode yet\n","");
-  return false;
+  #if defined(DRV_DISP_SDL1)
+    //pGui->nRotation = nRotation;
+    return false;
+  #endif
+  #if defined(DRV_DISP_SDL2)
+    // TODO: Implement support for display rotation
+    GSLC_DEBUG2_PRINT("ERROR: DrvRotate(%s) not supported in current DRV_DISP_SDL* mode yet\n","");
+    return false;
+  #endif
 }
 
 // =======================================================================
@@ -1117,7 +1124,7 @@ void gslc_DrvReportInfoPre()
     }
     #endif
     if (bDriverOk) {
-      GSLC_DEBUG_PRINT("DBG: - OK\n");
+      GSLC_DEBUG_PRINT("DBG: - OK\n","");
     } else {
       GSLC_DEBUG_PRINT("DBG: - Failed [%s]\n",SDL_GetError());
     }
@@ -1383,7 +1390,23 @@ void gslc_DrvPasteSurface(gslc_tsGui* pGui,int16_t nX, int16_t nY, void* pvSrc, 
   SDL_Rect offset;
   offset.x = nX;
   offset.y = nY;
-  SDL_BlitSurface(pSrc,NULL,pDest,&offset);
+
+
+  #if defined(DRV_DISP_SDL1)
+  if (GSLC_ROTATE < 1 || GSLC_ROTATE > 3) {
+    SDL_BlitSurface(pSrc,NULL,pDest,&offset);
+  } else {
+    SDL_Surface* rotated = rotozoomSurface( pSrc, GSLC_ROTATE * 90, 1.0, 0 );
+    SDL_FillRect(pDest, NULL, 0x000000);
+    SDL_Rect rec = {240, 320, 0, 0};
+    rec.x -= rotated->w/2 - pSrc->w/2;
+    rec.y -= rotated->h/2 - pSrc->h/2;
+    SDL_BlitSurface(rotated,NULL,pDest,&rec);
+  }
+  #endif
+  #if defined(DRV_DISP_SDL2)
+    SDL_BlitSurface(pSrc,NULL,pDest,&offset);
+  #endif
 }
 
 #endif
